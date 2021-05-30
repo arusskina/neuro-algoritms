@@ -24,7 +24,7 @@ class NeuronSubPopulation(object):
 
     def is_trials_completed(self) -> bool:
         trials = [neuron.trials for neuron in self.population]
-        return min(trials) > 10
+        return min(trials) >= 10
 
     def reset_trials(self):
         for neuron in self.population:
