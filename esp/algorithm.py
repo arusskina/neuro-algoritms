@@ -38,6 +38,7 @@ class ESPAlgorithm(object):
               x_train: np.array,
               y_train: np.array):
         for generation in range(generations_count):
+            trials_count = 0
             while not self.population.is_trials_completed():
                 selected_neurons = self.population.get_neurons()
                 NeuronPopulation.increment_trials(selected_neurons)
@@ -49,4 +50,5 @@ class ESPAlgorithm(object):
                     y_train=y_train)
                 for neuron in selected_neurons:
                     neuron.fitness += error
+                trials_count += 1
             self.population.reset_trials()
