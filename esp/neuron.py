@@ -9,7 +9,8 @@ class Neuron(object):
         self.output_count = output_count
         self.input_weights = None
         self.output_weights = None
-        self.fitness = 0.0
+        self.cumulative_fitness = 0.0
+        self.avg_fitness = 0.0
         self.trials = 0
 
     def init(self, min_value: float, max_value: float):
@@ -21,3 +22,6 @@ class Neuron(object):
             low=min_value,
             high=max_value,
             size=self.output_count)
+
+    def fit_avg_fitness(self):
+        self.avg_fitness = self.cumulative_fitness / self.trials

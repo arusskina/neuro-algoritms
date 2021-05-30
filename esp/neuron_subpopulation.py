@@ -29,3 +29,7 @@ class NeuronSubPopulation(object):
     def reset_trials(self):
         for neuron in self.population:
             neuron.trials = 0
+
+    def fit_avg_fitness(self):
+        for neuron in self.population:
+            neuron.fit_avg_fitness()

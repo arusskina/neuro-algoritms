@@ -33,6 +33,10 @@ class NeuronPopulation(object):
         for subpopulation in self.population:
             subpopulation.reset_trials()
 
+    def fit_avg_fitness(self):
+        for subpopulation in self.population:
+            subpopulation.fit_avg_fitness()
+
     @staticmethod
     def increment_trials(neurons: List[Neuron]):
         for n in neurons:

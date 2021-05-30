@@ -49,6 +49,7 @@ class ESPAlgorithm(object):
                     x_train=x_train,
                     y_train=y_train)
                 for neuron in selected_neurons:
-                    neuron.fitness += error
+                    neuron.cumulative_fitness += error
                 trials_count += 1
+            self.population.fit_avg_fitness()
             self.population.reset_trials()
