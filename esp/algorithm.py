@@ -21,12 +21,16 @@ class ESPAlgorithm(object):
                  hidden_layer_size: int,
                  population_size: int,
                  input_count: int,
-                 output_count: int):
+                 output_count: int,
+                 last_generations_count: int):
         self.population = NeuronPopulation(
             population_size=hidden_layer_size,
             subpopulation_size=population_size,
             input_count=input_count,
-            output_count=output_count)
+            output_count=output_count,
+            last_generations_count=last_generations_count)
+        self.best_nn = None
+        self.best_nn_fitness = 0.0
 
     def init(self, min_value: float, max_value: float):
         self.population.init(
@@ -41,9 +45,22 @@ class ESPAlgorithm(object):
             trials_count = self.check_fitness(
                 x_train=x_train,
                 y_train=y_train)
+            self.population.check_degeneration()
             self.population.crossover()
             self.population.mutation()
+            self.update_best_nn()
+            print('\r Generation {}, Trials = {}, Best NN Fitness = {}'
+                  .format(generation, trials_count, self.best_nn_fitness))
             self.population.reset_trials()
+
+    def update_best_nn(self):
+        best_neurons = self.population.get_best_neurons()
+        best_nn = NeuralNetwork(
+            hidden_neurons=best_neurons)
+        best_nn_fitness = sum([neuron.avg_fitness for neuron in best_neurons])
+        if self.best_nn is None or best_nn_fitness < self.best_nn_fitness:
+            self.best_nn = best_nn
+            self.best_nn_fitness = best_nn_fitness
 
     def check_fitness(self,
                       x_train: np.array,

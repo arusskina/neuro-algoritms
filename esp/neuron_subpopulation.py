@@ -1,5 +1,6 @@
 import random
 import numpy as np
+from collections import deque
 from .neuron import Neuron
 
 
@@ -7,12 +8,15 @@ class NeuronSubPopulation(object):
     def __init__(self,
                  population_size: int,
                  input_count: int,
-                 output_count: int):
+                 output_count: int,
+                 last_generations_count: int):
         self.population = []
         for i in range(population_size):
             self.population.append(Neuron(
                 input_count=input_count,
                 output_count=output_count))
+        self.last_generations_count = last_generations_count
+        self.best_neurons = {}
 
     def init(self, min_value: float, max_value: float):
         for i in range(len(self.population)):
@@ -54,6 +58,19 @@ class NeuronSubPopulation(object):
     def get_best_neuron(self) -> Neuron:
         self.population.sort(key=lambda x: x.avg_fitness)
         return self.population[0]
+
+    def check_degeneration(self):
+        best_neuron = self.get_best_neuron()
+        if best_neuron in self.best_neurons:
+            self.best_neurons[best_neuron].append(best_neuron.avg_fitness)
+        else:
+            self.best_neurons[best_neuron] = deque(maxlen=self.last_generations_count)
+        for neuron, fitness_list in self.best_neurons.items():
+            if len(fitness_list) == fitness_list.maxlen:
+                if neuron.avg_fitness > min(fitness_list):
+                    self.burst_mutation()
+                    self.best_neurons.clear()
+                    break
 
     def burst_mutation(self):
         best_neuron = self.get_best_neuron()

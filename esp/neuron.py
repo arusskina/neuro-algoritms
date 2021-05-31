@@ -22,6 +22,7 @@ class Neuron(object):
         self.input_weights = None
         self.output_weights = None
         self.cumulative_fitness = 0.0
+        self.prev_avg_fitness = 0.0
         self.avg_fitness = 0.0
         self.trials = 0
 
@@ -36,6 +37,7 @@ class Neuron(object):
             size=self.output_count)
 
     def fit_avg_fitness(self):
+        self.prev_avg_fitness = self.avg_fitness
         self.avg_fitness = self.cumulative_fitness / self.trials
 
     def mutation(self):
