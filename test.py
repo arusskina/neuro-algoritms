@@ -16,4 +16,4 @@ algorithm = ESPAlgorithm(
 
 algorithm.init(min_value=-1.0, max_value=1.0)
 
-algorithm.train(3, x_train=x_train, y_train=y_train)
+algorithm.train(generations_count=3, x_train=x_train, y_train=y_train)
