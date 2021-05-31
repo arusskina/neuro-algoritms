@@ -33,9 +33,9 @@ class NeuronPopulation(object):
         for subpopulation in self.population:
             subpopulation.reset_trials()
 
-    def fit_avg_fitness(self):
+    def crossover(self):
         for subpopulation in self.population:
-            subpopulation.fit_avg_fitness()
+            subpopulation.crossover()
 
     @staticmethod
     def increment_trials(neurons: List[Neuron]):

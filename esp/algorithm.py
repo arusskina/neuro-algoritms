@@ -51,5 +51,5 @@ class ESPAlgorithm(object):
                 for neuron in selected_neurons:
                     neuron.cumulative_fitness += error
                 trials_count += 1
-            self.population.fit_avg_fitness()
+            self.population.crossover()
             self.population.reset_trials()

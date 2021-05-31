@@ -31,9 +31,20 @@ class NeuronSubPopulation(object):
         for neuron in self.population:
             neuron.trials = 0
 
-    def fit_avg_fitness(self):
+    def crossover(self):
         for neuron in self.population:
             neuron.fit_avg_fitness()
+        self.population.sort(key=lambda x: x.avg_fitness)
+        selected_neurons_count = int(len(self.population) / 4)
+        selected_neurons_count -= selected_neurons_count % 2
+        for i in range(0, selected_neurons_count, 2):
+            parent1 = self.population[i]
+            parent2 = self.population[i + 1]
+            child1, child2 = Neuron.crossover(
+                parent1=parent1,
+                parent2=parent2)
+            self.population[-selected_neurons_count + i] = child1
+            self.population[-selected_neurons_count + i + 1] = child2
 
     def get_best_neuron(self) -> Neuron:
         self.population.sort(key=lambda x: x.avg_fitness)
