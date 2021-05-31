@@ -38,6 +38,10 @@ class Neuron(object):
     def fit_avg_fitness(self):
         self.avg_fitness = self.cumulative_fitness / self.trials
 
+    def mutation(self):
+        self.input_weights += np.random.standard_cauchy(self.input_count)
+        self.output_weights += np.random.standard_cauchy(self.output_count)
+
     @staticmethod
     def crossover(parent1, parent2):
         input_count = parent1.input_count

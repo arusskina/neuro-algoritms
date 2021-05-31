@@ -37,6 +37,10 @@ class NeuronPopulation(object):
         for subpopulation in self.population:
             subpopulation.crossover()
 
+    def mutation(self):
+        for subpopulation in self.population:
+            subpopulation.mutation()
+
     @staticmethod
     def increment_trials(neurons: List[Neuron]):
         for n in neurons:

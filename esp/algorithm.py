@@ -52,4 +52,5 @@ class ESPAlgorithm(object):
                     neuron.cumulative_fitness += error
                 trials_count += 1
             self.population.crossover()
+            self.population.mutation()
             self.population.reset_trials()

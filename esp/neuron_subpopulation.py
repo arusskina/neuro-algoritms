@@ -46,6 +46,11 @@ class NeuronSubPopulation(object):
             self.population[-selected_neurons_count + i] = child1
             self.population[-selected_neurons_count + i + 1] = child2
 
+    def mutation(self):
+        bottom_half = int(len(self.population) / 2)
+        for neuron in self.population[bottom_half:]:
+            neuron.mutation()
+
     def get_best_neuron(self) -> Neuron:
         self.population.sort(key=lambda x: x.avg_fitness)
         return self.population[0]
