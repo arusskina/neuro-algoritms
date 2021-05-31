@@ -38,19 +38,27 @@ class ESPAlgorithm(object):
               x_train: np.array,
               y_train: np.array):
         for generation in range(generations_count):
-            trials_count = 0
-            while not self.population.is_trials_completed():
-                selected_neurons = self.population.get_neurons()
-                NeuronPopulation.increment_trials(selected_neurons)
-                neural_network = NeuralNetwork(
-                    hidden_neurons=selected_neurons)
-                error = forward_train(
-                    neural_network=neural_network,
-                    x_train=x_train,
-                    y_train=y_train)
-                for neuron in selected_neurons:
-                    neuron.cumulative_fitness += error
-                trials_count += 1
+            trials_count = self.check_fitness(
+                x_train=x_train,
+                y_train=y_train)
             self.population.crossover()
             self.population.mutation()
             self.population.reset_trials()
+
+    def check_fitness(self,
+                      x_train: np.array,
+                      y_train: np.array) -> int:
+        trials_count = 0
+        while not self.population.is_trials_completed():
+            selected_neurons = self.population.get_neurons()
+            NeuronPopulation.increment_trials(selected_neurons)
+            neural_network = NeuralNetwork(
+                hidden_neurons=selected_neurons)
+            error = forward_train(
+                neural_network=neural_network,
+                x_train=x_train,
+                y_train=y_train)
+            for neuron in selected_neurons:
+                neuron.cumulative_fitness += error
+            trials_count += 1
+        return trials_count
