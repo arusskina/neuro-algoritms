@@ -9,18 +9,24 @@ class NeuronSubPopulation(object):
                  population_size: int,
                  input_count: int,
                  output_count: int,
-                 last_generations_count: int):
+                 last_generations_count: int,
+                 trials_per_neuron: int,
+                 subpopulation_id: int):
         self.population = []
         for i in range(population_size):
             self.population.append(Neuron(
                 input_count=input_count,
-                output_count=output_count))
+                output_count=output_count,
+                neuron_id=i))
         self.last_generations_count = last_generations_count
+        self.trials_per_neuron = trials_per_neuron
+        self.id = subpopulation_id
+        self.generation = 0
         self.best_neurons = {}
 
     def init(self, min_value: float, max_value: float):
-        for i in range(len(self.population)):
-            self.population[i].init(
+        for neuron in self.population:
+            neuron.init(
                 min_value=min_value,
                 max_value=max_value)
 
@@ -29,7 +35,7 @@ class NeuronSubPopulation(object):
 
     def is_trials_completed(self) -> bool:
         trials = [neuron.trials for neuron in self.population]
-        return min(trials) >= 10
+        return min(trials) >= self.trials_per_neuron
 
     def reset_trials(self):
         for neuron in self.population:
@@ -63,30 +69,35 @@ class NeuronSubPopulation(object):
 
     def check_degeneration(self):
         best_neuron = self.get_best_neuron()
-        if best_neuron in self.best_neurons:
-            self.best_neurons[best_neuron].append(best_neuron.avg_fitness)
+        if best_neuron.id in self.best_neurons.keys():
+            self.best_neurons[best_neuron.id].append(best_neuron.avg_fitness)
         else:
-            self.best_neurons[best_neuron] = deque(maxlen=self.last_generations_count)
-        for neuron, fitness_list in self.best_neurons.items():
+            self.best_neurons[best_neuron.id] = deque(maxlen=self.last_generations_count)
+        clear_best_neurons = False
+        for neuron_id, fitness_list in self.best_neurons.items():
             if len(fitness_list) == fitness_list.maxlen:
-                if neuron.avg_fitness > min(fitness_list):
-                    self.burst_mutation()
-                    self.best_neurons.clear()
+                if self.population[neuron_id].avg_fitness > min(fitness_list):
+                    self.burst_mutation(neuron=best_neuron)
+                    clear_best_neurons = True
                     break
+        if clear_best_neurons:
+            self.best_neurons = {}
 
-    def burst_mutation(self):
-        print('Burst mutation')
-        best_neuron = self.get_best_neuron()
-        input_count = best_neuron.input_count
-        output_count = best_neuron.output_count
+    def burst_mutation(self, neuron: Neuron):
+        print('Взрывная мутация для подпопуляции {0:>3d}. Текущее поколение {1:>3d}'
+              .format(self.id, self.generation))
+        input_count = neuron.input_count
+        output_count = neuron.output_count
         new_population = []
-        for _ in self.population:
+        for i in range(len(self.population)):
             new_neuron = Neuron(
                 input_count=input_count,
-                output_count=output_count)
+                output_count=output_count,
+                neuron_id=i)
             new_neuron.input_weights = \
-                np.random.standard_cauchy(input_count) + best_neuron.input_weights
+                np.random.standard_cauchy(input_count) * 0.05 + neuron.input_weights
             new_neuron.output_weights = \
-                np.random.standard_cauchy(output_count) + best_neuron.output_weights
+                np.random.standard_cauchy(output_count) * 0.05 + neuron.output_weights
             new_population.append(new_neuron)
         self.population = new_population
+        self.generation += 1

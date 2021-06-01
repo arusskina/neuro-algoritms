@@ -1,6 +1,7 @@
 from typing import List
 import numpy as np
 from statistics import mean
+import time
 from .neuron_population import NeuronPopulation
 from .neural_network import NeuralNetwork
 from .neuron import Neuron
@@ -30,13 +31,15 @@ class ESPAlgorithm(object):
                  population_size: int,
                  input_count: int,
                  output_count: int,
-                 last_generations_count: int):
+                 last_generations_count: int,
+                 trials_per_neuron: int):
         self.population = NeuronPopulation(
             population_size=hidden_layer_size,
             subpopulation_size=population_size,
             input_count=input_count,
             output_count=output_count,
-            last_generations_count=last_generations_count)
+            last_generations_count=last_generations_count,
+            trials_per_neuron=trials_per_neuron)
         self.best_nn = None
         self.best_nn_fitness = 0.0
 
@@ -49,17 +52,22 @@ class ESPAlgorithm(object):
               generations_count: int,
               x_train: np.array,
               y_train: np.array):
+        result = []
         for generation in range(generations_count):
+            start_time = time.time()
             trials_count = self.check_fitness(
                 x_train=x_train,
                 y_train=y_train)
             self.population.fit_avg_fitness()
-            self.update_best_nn()
+            if self.update_best_nn():
+                result.append((generation, self.best_nn_fitness))
             self.population.check_degeneration()
             self.population.crossover()
             self.population.mutation()
-            print('\r Generation {}, Trials = {}, Best NN Fitness = {}'
-                  .format(generation, trials_count, self.best_nn_fitness))
+            full_time = time.time() - start_time
+            print('Поколение {0:>5d}, Количество попыток {1:>3d}, '
+                  'Приспособленность лучшего нейрона {2:2.6f}, Время выполнения {3:3.3f} s'
+                  .format(generation, trials_count, self.best_nn_fitness, full_time))
             self.population.reset_trials()
 
     def update_best_nn(self):
@@ -70,6 +78,8 @@ class ESPAlgorithm(object):
         if self.best_nn is None or best_nn_fitness < self.best_nn_fitness:
             self.best_nn = best_nn
             self.best_nn_fitness = best_nn_fitness
+            return True
+        return False
 
     def check_fitness(self,
                       x_train: np.array,

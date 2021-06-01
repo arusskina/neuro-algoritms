@@ -9,14 +9,17 @@ class NeuronPopulation(object):
                  subpopulation_size: int,
                  input_count: int,
                  output_count: int,
-                 last_generations_count: int):
+                 last_generations_count: int,
+                 trials_per_neuron: int):
         self.population = []
         for i in range(population_size):
             self.population.append(NeuronSubPopulation(
                 population_size=subpopulation_size,
                 input_count=input_count,
                 output_count=output_count,
-                last_generations_count=last_generations_count))
+                last_generations_count=last_generations_count,
+                trials_per_neuron=trials_per_neuron,
+                subpopulation_id=i))
 
     def init(self, min_value: float, max_value: float):
         for i in range(len(self.population)):
