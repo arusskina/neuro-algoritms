@@ -69,6 +69,7 @@ class ESPAlgorithm(object):
                   'Приспособленность лучшего нейрона {2:2.6f}, Время выполнения {3:3.3f} s'
                   .format(generation, trials_count, self.best_nn_fitness, full_time))
             self.population.reset_trials()
+        return result
 
     def update_best_nn(self):
         best_neurons = self.population.get_best_neurons()
