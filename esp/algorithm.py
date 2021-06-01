@@ -1,6 +1,9 @@
+from typing import List
 import numpy as np
+from statistics import mean
 from .neuron_population import NeuronPopulation
 from .neural_network import NeuralNetwork
+from .neuron import Neuron
 from .utils import mse
 
 
@@ -14,6 +17,11 @@ def forward_train(neural_network: NeuralNetwork,
         error = mse(y_true=y_train[i], y_pred=output)
         errors.append(error)
     return np.array(errors).mean()
+
+
+def increment_trials(neurons: List[Neuron]):
+    for neuron in neurons:
+        neuron.trials += 1
 
 
 class ESPAlgorithm(object):
@@ -45,10 +53,11 @@ class ESPAlgorithm(object):
             trials_count = self.check_fitness(
                 x_train=x_train,
                 y_train=y_train)
+            self.population.fit_avg_fitness()
+            self.update_best_nn()
             self.population.check_degeneration()
             self.population.crossover()
             self.population.mutation()
-            self.update_best_nn()
             print('\r Generation {}, Trials = {}, Best NN Fitness = {}'
                   .format(generation, trials_count, self.best_nn_fitness))
             self.population.reset_trials()
@@ -57,7 +66,7 @@ class ESPAlgorithm(object):
         best_neurons = self.population.get_best_neurons()
         best_nn = NeuralNetwork(
             hidden_neurons=best_neurons)
-        best_nn_fitness = sum([neuron.avg_fitness for neuron in best_neurons])
+        best_nn_fitness = mean([neuron.avg_fitness for neuron in best_neurons])
         if self.best_nn is None or best_nn_fitness < self.best_nn_fitness:
             self.best_nn = best_nn
             self.best_nn_fitness = best_nn_fitness
@@ -68,7 +77,7 @@ class ESPAlgorithm(object):
         trials_count = 0
         while not self.population.is_trials_completed():
             selected_neurons = self.population.get_neurons()
-            NeuronPopulation.increment_trials(selected_neurons)
+            increment_trials(selected_neurons)
             neural_network = NeuralNetwork(
                 hidden_neurons=selected_neurons)
             error = forward_train(

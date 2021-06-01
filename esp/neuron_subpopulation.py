@@ -35,9 +35,11 @@ class NeuronSubPopulation(object):
         for neuron in self.population:
             neuron.trials = 0
 
-    def crossover(self):
+    def fit_avg_fitness(self):
         for neuron in self.population:
             neuron.fit_avg_fitness()
+
+    def crossover(self):
         self.population.sort(key=lambda x: x.avg_fitness)
         selected_neurons_count = int(len(self.population) / 4)
         selected_neurons_count -= selected_neurons_count % 2
@@ -73,6 +75,7 @@ class NeuronSubPopulation(object):
                     break
 
     def burst_mutation(self):
+        print('Burst mutation')
         best_neuron = self.get_best_neuron()
         input_count = best_neuron.input_count
         output_count = best_neuron.output_count

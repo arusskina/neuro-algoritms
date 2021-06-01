@@ -9,11 +9,11 @@ cancer1_dataset = Cancer1Dataset()
 x_train, y_train = cancer1_dataset.get_train_data()
 
 algorithm = ESPAlgorithm(
-    hidden_layer_size=3,
-    population_size=8,
+    hidden_layer_size=10,
+    population_size=20,
     input_count=x_train.shape[1],
     output_count=y_train.shape[1],
-    last_generations_count=5)
+    last_generations_count=2)
 
 algorithm.init(
     min_value=-1.0,
